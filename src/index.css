@@ -42,3 +42,6 @@ code {
 .snake {
   background-color: green;
 }
+.snakeHead {
+  background-color: black;
+}
