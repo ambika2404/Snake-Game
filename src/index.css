@@ -24,7 +24,7 @@ code {
 
 .board {
   display: grid;
-  grid-template-columns: repeat(15, 20px);
+  grid-template-columns: repeat(15, 40px);
   /* grid-template-rows: repeat(15, 20px); */
   width: max-content;
   gap: 1px;
@@ -32,8 +32,8 @@ code {
 }
 
 .cell {
-  width: 20px;
-  height: 20px;
+  width: 40px;
+  height: 40px;
   background-color: white;
 }
 .food {
@@ -44,4 +44,8 @@ code {
 }
 .snakeHead {
   background-color: black;
+}
+.score {
+  color: white;
+  font-size: 30px;
 }

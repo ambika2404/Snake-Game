@@ -1,12 +1,17 @@
 import "./App.css";
 import { useEffect, useState } from "react";
 function App() {
-  const [snake, setSnake] = useState([
+  const initialSnakePosition = [
     { row: 7, col: 7 },
     { row: 8, col: 7 },
-  ]);
+  ];
+
+  const [snake, setSnake] = useState(initialSnakePosition);
   const [food, setFood] = useState({ x: 5, y: 5 });
-  const [direction, setDirection] = useState("left");
+  const [direction, setDirection] = useState("Left");
+  const [score, setScore] = useState(0);
+
+  // BOARD
 
   function renderBoard() {
     let board = [];
@@ -38,41 +43,100 @@ function App() {
     return board;
   }
 
+  // SNAKE DIRECTION
+
   function updateGame() {
     let newSnake = [...snake];
     switch (direction) {
-      case "left":
+      case "Left":
         newSnake.unshift({ row: newSnake[0].row, col: newSnake[0].col - 1 });
         break;
-      case "right":
+      case "Right":
         newSnake.unshift({ row: newSnake[0].row, col: newSnake[0].col + 1 });
         break;
-      case "up":
+      case "Up":
         newSnake.unshift({ row: newSnake[0].row - 1, col: newSnake[0].col });
         break;
-      case "down":
+      case "Down":
         newSnake.unshift({ row: newSnake[0].row + 1, col: newSnake[0].col });
         break;
     }
-    newSnake.pop();
+    if (gameOver(newSnake[0])) return;
+
+    let isAteFood = snake[0].row === food.x && snake[0].col === food.y;
+    if (isAteFood) {
+      setScore((prev) => prev + 1);
+      getRandomPosition();
+    } else {
+      newSnake.pop();
+    }
+    console.log(newSnake);
     setSnake(newSnake);
   }
 
-  // useEffect(() => {
-  //   let interval = setInterval(updateGame, 2000);
-  //   return () => clearInterval(interval, updateGame);
-  // });
+  function updateDirection(e) {
+    let code = e.code;
+    switch (code) {
+      case "ArrowUp":
+        if (direction !== "Down") setDirection("Up");
+        break;
+      case "ArrowDown":
+        console.log(direction);
+        if (direction !== "Up") setDirection("Down");
+        break;
+      case "ArrowRight":
+        if (direction !== "Left") setDirection("Right");
+        break;
+      case "ArrowLeft":
+        if (direction !== "Right") setDirection("Left");
+        break;
+    }
+  }
+
+  useEffect(() => {
+    let interval = setInterval(updateGame, 300);
+    return () => clearInterval(interval, updateGame);
+  });
+
+  useEffect(() => {
+    document.addEventListener("keydown", updateDirection);
+    return () => document.removeEventListener("keydown", updateDirection);
+  });
 
   function getRandomPosition() {
     const row = Math.floor(Math.random() * 15);
     const col = Math.floor(Math.random() * 15);
-    return { row, col };
+    setFood({ x: row, y: col });
   }
-  console.log(getRandomPosition());
+
+  function resetGame() {
+    setSnake(initialSnakePosition);
+    setFood({ x: 5, y: 5 });
+    setDirection("Left");
+    setScore(0);
+  }
+
+  function gameOver(headCord) {
+    if (
+      headCord.col < 0 ||
+      headCord.col > 14 ||
+      headCord.row < 0 ||
+      headCord.row > 14 ||
+      snake.some(
+        (cord) => cord.row === headCord.row && cord.col === headCord.col
+      )
+    ) {
+      alert(`GAME OVER!!, Your score is ${score}`);
+      resetGame();
+      return true;
+    }
+    return false;
+  }
+
   return (
     <div className="App">
       <div className="score">
-        Score: <span>30</span>
+        Score: <span>{score}</span>
       </div>
       <div className="board">{renderBoard()}</div>
     </div>
